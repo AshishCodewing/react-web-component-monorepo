@@ -1,0 +1,12 @@
+/* Host Theme Integration
+ * Maps parent app CSS variables to Tailwind utility classes
+ * Parent provides: --base-color-100, --base-color-80, --primary-color-100, etc.
+ */
+
+@theme inline {
+  --color-base-100: rgb(var(--base-color-100, 17 19 34));
+  --color-base-80: rgb(var(--base-color-80, 64 73 104));
+  --color-primary-100: rgb(var(--primary-color-100, 20 93 143));
+  --default-font-family: var(--tripCart-fontFamily, var(--font-sans));
+}
+

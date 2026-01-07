@@ -1,6 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@monorepo/ui/components/accordion'
 import { defineWebComponent } from '@/core/WebComponentFactory';
-import "@monorepo/ui/globals.css"
+import "@/styles/widget-base.css"
 
 interface AccordionWidgetProps {
     title: string;
@@ -8,14 +8,16 @@ interface AccordionWidgetProps {
 }
 function AccordionWidget({ title, content }: AccordionWidgetProps) {
   return (
-    <Accordion type="single" collapsible> 
-        <AccordionItem value="item-1">
-            <AccordionTrigger>{title}</AccordionTrigger>
-            <AccordionContent>
-            {content}
-            </AccordionContent>
-        </AccordionItem>
-    </Accordion>
+    <div className='bg-primary-100'>
+        <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
+                <AccordionTrigger>{title}</AccordionTrigger>
+                <AccordionContent>
+                {content}
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    </div>
   )
 }
 
