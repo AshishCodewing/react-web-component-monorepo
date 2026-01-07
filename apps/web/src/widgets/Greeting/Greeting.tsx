@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@monorepo/ui/components/accordion'
 import "@monorepo/ui/globals.css"
 
