@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
@@ -15,6 +15,7 @@ function getWidgetEntries(): Record<string, string> {
 
     const entry = path.join(widgetsDir, dir.name, 'index.tsx')
     if (existsSync(entry)) {
+      // key = widget name
       entries[dir.name] = entry
     }
   }
@@ -22,95 +23,45 @@ function getWidgetEntries(): Record<string, string> {
   return entries
 }
 
-export default defineConfig(({ mode }) => {
-  const isDev = mode === 'development'
-  const env = loadEnv(mode, process.cwd(), '')
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
 
-  return {
-    plugins: [
-      react({
-        jsxRuntime: 'automatic',
-      }),
-      {
-        name: 'remove-preamble-check',
-        transform(code) {
-          if (code.includes("can't detect preamble")) {
-            // Remove the error throw for preamble detection
-            return code.replace(
-              /throw new Error\([^)]*can't detect preamble[^)]*\);?/g,
-              'console.warn("Preamble detection skipped");'
-            );
+  server: {
+    host: '0.0.0.0',
+    port: 5175,
+    cors: true
+  },
+
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
+
+  build: {
+    target: 'es2020',
+    outDir: 'dist',
+    emptyOutDir: true,
+    manifest: true,
+    sourcemap: false,
+
+    rollupOptions: {
+      input: getWidgetEntries(),
+
+      output: {
+        format: 'es',
+        entryFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash][extname]',
+
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'react-vendor'
+            if (id.includes('@radix-ui')) return 'radix-vendor'
+            return 'vendor'
           }
-        },
-      },
-      tailwindcss(),
-    ],
-
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, 'src'),
-      },
-      dedupe: ['react', 'react-dom'],
-    },
-
-    server: {
-      host: '0.0.0.0',
-      port: 5175,
-      cors: true,
-    },
-
-    esbuild: {
-      jsxDev: isDev,
-    },
-
-    build: {
-      target: 'es2020',
-      minify: isDev ? false : 'terser',
-      sourcemap: isDev,
-      manifest: true,
-      cssCodeSplit: true,
-
-      rollupOptions: {
-        input: getWidgetEntries(),
-
-        /**
-         * React is bundled in both dev and prod for standalone widgets
-         * Widgets need to be self-contained web components
-         */
-        external: [],
-
-        output: {
-          format: 'es',
-          dir: 'dist',
-          entryFileNames: '[name]/[name].[hash].js',
-          chunkFileNames: 'shared/[name].[hash].js',
-          assetFileNames: 'assets/[name].[hash][extname]',
-        },
-      },
-
-      terserOptions: {
-        compress: {
-          drop_console: !isDev,
-          drop_debugger: true,
-        },
-        format: {
-          comments: false,
-        },
-      },
-    },
-
-    define: {
-      'process.env.NODE_ENV': JSON.stringify(
-        isDev ? 'development' : 'production'
-      ),
-      __DEV__: isDev,
-
-      'import.meta.env.VITE_WIDGET_BASE_URL': JSON.stringify(
-        env.VITE_WIDGET_BASE_URL
-      ),
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(
-        env.VITE_API_BASE_URL
-      ),
-    },
+        }
+      }
+    }
   }
 })
+
