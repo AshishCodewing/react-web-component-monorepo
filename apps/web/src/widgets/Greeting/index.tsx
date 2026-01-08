@@ -1,16 +1,17 @@
 import Greeting, { type GreetingWidgetProps } from "./Greeting";
-import r2wc from "@r2wc/react-to-web-component";
+import { createWebComponent, registerWebComponent } from "../../core/WebComponentFactory";
 import "@monorepo/ui/globals.css";
 
-const GreetingWidget = r2wc<GreetingWidgetProps>(Greeting, {
-    props: {
-        title: 'string',
-        content: 'string',
+const GreetingWidget = createWebComponent<GreetingWidgetProps>({
+    tagName: 'greeting-widget',
+    component: Greeting,
+    observedAttributes: {
+        'title': 'title',
+        'content': 'content',
     },
+    useShadowDom: false, // Use regular DOM for easier CSS integration
 });
 
-if (!customElements.get('greeting-widget')) {
-    customElements.define('greeting-widget', GreetingWidget);
-}
+registerWebComponent('greeting-widget', GreetingWidget);
 
 export default GreetingWidget;

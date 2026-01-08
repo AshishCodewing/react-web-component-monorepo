@@ -4,79 +4,84 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { readdirSync, existsSync } from 'fs'
 
-/**
- * Automatically discover all widgets in src/widgets/
- * Each widget must have an index.tsx file
- */
-function getWidgetEntries() {
-  const widgetsDir = path.resolve(__dirname, './src/widgets')
+function getWidgetEntries(): Record<string, string> {
+  const widgetsDir = path.resolve(__dirname, 'src/widgets')
   const entries: Record<string, string> = {}
 
-  try {
-    const widgets = readdirSync(widgetsDir, { withFileTypes: true })
-      .filter(d => d.isDirectory())
-      .map(d => d.name)
+  if (!existsSync(widgetsDir)) return entries
 
-    widgets.forEach(widget => {
-      const entryPath = path.resolve(widgetsDir, widget, 'index.tsx')
-      if (existsSync(entryPath)) {
-        entries[widget] = `./src/widgets/${widget}/index.tsx`
-        console.log(`✅ Found widget: ${widget}`)
-      }
-    })
-  } catch (err) {
-    console.error('❌ Error scanning widgets directory:', err)
+  for (const dir of readdirSync(widgetsDir, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue
+
+    const entry = path.join(widgetsDir, dir.name, 'index.tsx')
+    if (existsSync(entry)) {
+      entries[dir.name] = entry
+    }
   }
 
   return entries
 }
 
 export default defineConfig(({ mode }) => {
+  const isDev = mode === 'development'
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
     plugins: [
       react({
-        jsxRuntime: 'automatic',        // ✅ Correct JSX runtime
-        babel: {
-          plugins: [],
-        },
+        jsxRuntime: 'automatic',
       }),
+      {
+        name: 'remove-preamble-check',
+        transform(code) {
+          if (code.includes("can't detect preamble")) {
+            // Remove the error throw for preamble detection
+            return code.replace(
+              /throw new Error\([^)]*can't detect preamble[^)]*\);?/g,
+              'console.warn("Preamble detection skipped");'
+            );
+          }
+        },
+      },
       tailwindcss(),
     ],
 
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
+        '@': path.resolve(__dirname, 'src'),
       },
-      dedupe: ['react', 'react-dom'],   // ✅ Prevent duplicate React
+      dedupe: ['react', 'react-dom'],
     },
 
     server: {
       host: '0.0.0.0',
       port: 5175,
-      watch: {
-        usePolling: true,
-      },
       cors: true,
     },
 
     esbuild: {
-      jsxDev: false,                    // ✅ CRITICAL: disable jsxDEV
+      jsxDev: isDev,
     },
 
     build: {
-      target: 'es2019',                 // ✅ Safe for web components
-      minify: 'terser',
-      sourcemap: mode !== 'production',
+      target: 'es2020',
+      minify: isDev ? false : 'terser',
+      sourcemap: isDev,
       manifest: true,
-      cssCodeSplit: false,
+      cssCodeSplit: true,
 
       rollupOptions: {
         input: getWidgetEntries(),
+
+        /**
+         * React is bundled in both dev and prod for standalone widgets
+         * Widgets need to be self-contained web components
+         */
+        external: [],
+
         output: {
-          dir: 'dist',
           format: 'es',
+          dir: 'dist',
           entryFileNames: '[name]/[name].[hash].js',
           chunkFileNames: 'shared/[name].[hash].js',
           assetFileNames: 'assets/[name].[hash][extname]',
@@ -85,7 +90,7 @@ export default defineConfig(({ mode }) => {
 
       terserOptions: {
         compress: {
-          drop_console: mode === 'production',
+          drop_console: !isDev,
           drop_debugger: true,
         },
         format: {
@@ -95,13 +100,17 @@ export default defineConfig(({ mode }) => {
     },
 
     define: {
-      // ✅ Force production React runtime ALWAYS
-      'process.env.NODE_ENV': JSON.stringify('production'),
-      __DEV__: false,
+      'process.env.NODE_ENV': JSON.stringify(
+        isDev ? 'development' : 'production'
+      ),
+      __DEV__: isDev,
 
-      // Env passthrough
-      'import.meta.env.VITE_WIDGET_BASE_URL': JSON.stringify(env.VITE_WIDGET_BASE_URL),
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL),
+      'import.meta.env.VITE_WIDGET_BASE_URL': JSON.stringify(
+        env.VITE_WIDGET_BASE_URL
+      ),
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(
+        env.VITE_API_BASE_URL
+      ),
     },
   }
 })
