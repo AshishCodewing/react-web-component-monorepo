@@ -1,13 +1,12 @@
 import r2wc from '@r2wc/react-to-web-component'
-import CheckboxComponent from './Checkbox'
+import BaseComponent from './Base'
 import "@/styles/widget-base.css"
-
+import "@/styles/base-theme.css"
 customElements.define(
-  'checkbox-widget',
-  r2wc(CheckboxComponent, {
+  'base-widget',
+  r2wc(BaseComponent, {
     props: {
       label: 'string',
     },
-    shadow: 'open',
   })
 )

@@ -44,14 +44,20 @@ export default defineConfig({
     emptyOutDir: true,
     manifest: true,
     sourcemap: false,
-
+    cssCodeSplit: true,
     rollupOptions: {
       input: getWidgetEntries(),
 
       output: {
         format: 'es',
         entryFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash][extname]',
+        assetFileNames: (assetInfo) => {
+          // This helps keep CSS names tied to the widget name
+          if (assetInfo.name?.endsWith('.css')) {
+            return 'assets/[name].[hash][extname]';
+          }
+          return 'assets/[name].[hash][extname]';
+        },
 
         manualChunks(id) {
           if (id.includes('node_modules')) {
