@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { readdirSync, existsSync } from 'fs'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 function getWidgetEntries(): Record<string, string> {
   const widgetsDir = path.resolve(__dirname, 'src/widgets')
@@ -23,7 +24,18 @@ function getWidgetEntries(): Record<string, string> {
 }
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: 'automatic',
+    }),
+    // Bundle analyzer - generates stats.html after build
+    mode === 'production' && visualizer({
+      filename: 'dist/stats.html',
+      open: false,
+      gzipSize: true,
+      brotliSize: true,
+    }),
+  ].filter(Boolean),
 
   server: {
     host: '0.0.0.0', // Required for Docker - allows external access
@@ -53,7 +65,7 @@ export default defineConfig(({ mode }) => ({
     target: 'es2020',
     outDir: 'dist',
     emptyOutDir: true,
-    manifest: true,
+    manifest: 'manifest.json', // Outputs to dist/manifest.json (accessible via preview server)
     sourcemap: mode === 'production' ? false : true,
     cssCodeSplit: true,
     rollupOptions: {
@@ -91,9 +103,20 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === 'production',
         drop_debugger: mode === 'production',
+        // Aggressive optimizations
+        passes: 2, // Multiple compression passes
+        pure_getters: true, // Assume getters have no side effects
+        unsafe_arrows: true, // Convert functions to arrows where safe
+        unsafe_methods: true, // Optimize method calls
+        ecma: 2020,
+      },
+      mangle: {
+        // Shorten property names (careful with external APIs)
+        properties: false,
       },
       format: {
         comments: false,
+        ecma: 2020,
       },
     },
   }

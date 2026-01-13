@@ -4,7 +4,7 @@ import React from 'react';
 
 import "@/styles/tokens.css"
 import styles from './index.module.css';
-import { CheckIcon } from 'lucide-react';
+import { Check as CheckIcon } from 'lucide-react';
 
 interface Package {
   id: number;
