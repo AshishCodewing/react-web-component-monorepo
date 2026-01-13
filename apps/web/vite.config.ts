@@ -22,13 +22,25 @@ function getWidgetEntries(): Record<string, string> {
   return entries
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
 
   server: {
-    host: '0.0.0.0',
+    host: '0.0.0.0', // Required for Docker - allows external access
     port: 5175,
-    cors: true
+    // Use polling only if file watching doesn't work in Docker
+    // Uncomment if you experience HMR issues in Docker:
+    // watch: {
+    //   usePolling: true,
+    // },
+    cors: {
+      origin: '*', // Allow all origins for Web Components/widgets
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      // Note: credentials cannot be true with origin: '*'
+      // Set to true only if you need cookies/auth and specify exact origins
+      credentials: false,
+    },
   },
 
   resolve: {
@@ -42,7 +54,7 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     manifest: true,
-    sourcemap: false,
+    sourcemap: mode === 'production' ? false : true,
     cssCodeSplit: true,
     rollupOptions: {
       input: getWidgetEntries(),
@@ -51,13 +63,7 @@ export default defineConfig({
         format: 'es',
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'shared/[name].[hash].js',
-        assetFileNames: (assetInfo) => {
-          // This helps keep CSS names tied to the widget name
-          if (assetInfo.names?.[0]?.endsWith('.css')) {
-            return 'assets/[name].[hash][extname]';
-          }
-          return 'assets/[name].[hash][extname]';
-        },
+        assetFileNames: 'assets/[name].[hash][extname]',
 
         manualChunks(id) {
           if (id.includes('node_modules')) {
@@ -79,7 +85,17 @@ export default defineConfig({
           }
         }
       }
-    }
+    },
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: mode === 'production',
+      },
+      format: {
+        comments: false,
+      },
+    },
   }
-})
+}))
 
