@@ -235,7 +235,6 @@ export function createWebComponent<TProps = any>(
       // Custom styles - wrap in <style> tag
       if (styles) {
         const styleElement = document.createElement('style');
-        styleElement.setAttribute('data-widget', tagName);
         styleElement.textContent = styles;
         shadowRoot.appendChild(styleElement);
       }

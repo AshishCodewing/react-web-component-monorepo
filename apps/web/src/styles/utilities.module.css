@@ -1,0 +1,98 @@
+/* Shared Utility Classes - Composable CSS Modules */
+
+/* Layout */
+.flex {
+    display: flex;
+  }
+  
+  .flexColumn {
+    flex-direction: column;
+  }
+  
+  .flexRow {
+    flex-direction: row;
+  }
+  
+  .itemsCenter {
+    align-items: center;
+  }
+  
+  .itemsStart {
+    align-items: flex-start;
+  }
+  
+  .justifyCenter {
+    justify-content: center;
+  }
+  
+  .justifyBetween {
+    justify-content: space-between;
+  }
+  
+  .gapXs {
+    gap: var(--spacing-xs);
+  }
+  
+  .gapSm {
+    gap: var(--spacing-sm);
+  }
+  
+  .gapMd {
+    gap: var(--spacing-md);
+  }
+  
+  .gapLg {
+    gap: var(--spacing-lg);
+  }
+  
+  /* Spacing */
+  .pXs { padding: var(--spacing-xs); }
+  .pSm { padding: var(--spacing-sm); }
+  .pMd { padding: var(--spacing-md); }
+  .pLg { padding: var(--spacing-lg); }
+  
+  .pxSm { padding-inline: var(--spacing-sm); }
+  .pxMd { padding-inline: var(--spacing-md); }
+  .pxLg { padding-inline: var(--spacing-lg); }
+  
+  .pySm { padding-block: var(--spacing-sm); }
+  .pyMd { padding-block: var(--spacing-md); }
+  .pyLg { padding-block: var(--spacing-lg); }
+  
+  /* Typography */
+  .textXs { font-size: var(--font-size-xs); }
+  .textSm { font-size: var(--font-size-sm); }
+  .textBase { font-size: var(--font-size-base); }
+  .textLg { font-size: var(--font-size-lg); }
+  
+  .fontNormal { font-weight: var(--font-weight-normal); }
+  .fontMedium { font-weight: var(--font-weight-medium); }
+  .fontSemibold { font-weight: var(--font-weight-semibold); }
+  .fontBold { font-weight: var(--font-weight-bold); }
+  
+  /* Visual */
+  .roundedSm { border-radius: var(--radius-sm); }
+  .roundedMd { border-radius: var(--radius-md); }
+  .roundedLg { border-radius: var(--radius-lg); }
+  
+  .outlineNone {
+    outline: 0;
+  }
+  
+  .outlineFocus {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
+  
+  /* States */
+  .visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }

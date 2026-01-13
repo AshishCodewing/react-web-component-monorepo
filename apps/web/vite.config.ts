@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { readdirSync, existsSync } from 'fs'
 
@@ -24,7 +23,7 @@ function getWidgetEntries(): Record<string, string> {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react()],
 
   server: {
     host: '0.0.0.0',
@@ -51,9 +50,10 @@ export default defineConfig({
       output: {
         format: 'es',
         entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'shared/[name].[hash].js',
         assetFileNames: (assetInfo) => {
           // This helps keep CSS names tied to the widget name
-          if (assetInfo.name?.endsWith('.css')) {
+          if (assetInfo.names?.[0]?.endsWith('.css')) {
             return 'assets/[name].[hash][extname]';
           }
           return 'assets/[name].[hash][extname]';
@@ -63,6 +63,7 @@ export default defineConfig({
           if (id.includes('node_modules')) {
             if (id.includes('react')) return 'react-vendor'
             if (id.includes('@radix-ui')) return 'radix-vendor'
+            if (id.includes('@base-ui')) return 'base-ui-vendor'
             return 'vendor'
           }
         }
