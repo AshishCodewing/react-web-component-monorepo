@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: start;
     gap: var(--spacing-lg);
-    color: var(--base-color-100);
+    color: var(--base-clr-100);
     line-height: var(--line-height-normal);
 }
 
@@ -20,12 +20,12 @@
     padding-block: var(--spacing-md);
     padding-inline: var(--spacing-md);
     border-radius: var(--radius-md);
-    border: 1px solid var(--base-color-30);
+    border: 1px solid var(--base-clr-30);
     width: 100%;
 }
 
 .Item:has([data-checked]) {
-    border-color: var(--primary-color-100);
+    border-color: var(--primary-clr-100);
 }
 
 .ItemContent {
@@ -47,16 +47,16 @@
     transition: background-color var(--transition-base);
 
     &[data-unchecked] {
-        border: 1px solid var(--base-color-30);
+        border: 1px solid var(--base-clr-30);
     }
 
     &[data-checked] {
-        border: 1px solid var(--primary-color-100);
-        background-color: var(--primary-color-10);
+        border: 1px solid var(--primary-clr-100);
+        background-color: var(--primary-clr-10);
     }
 
     &:focus-visible {
-        outline: 2px solid var(--primary-color-100);
+        outline: 2px solid var(--primary-clr-100);
         outline-offset: 2px;
     }
 }
@@ -65,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary-color-100);
+    color: var(--primary-clr-100);
     width: 0.875rem;
     height: 0.875rem;
 
@@ -75,7 +75,7 @@
 }
 
 .ViewDetails {
-    color: var(--primary-color-100);
+    color: var(--primary-clr-100);
     font-size: 0.8125rem;
     font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-tight);

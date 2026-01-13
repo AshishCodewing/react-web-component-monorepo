@@ -1,8 +1,6 @@
 import { defineWebComponent } from "@/core/WebComponentFactory";
 import Packages from "./Package";
 import type { PackagesProps } from "./Package";
-import "@/styles/tokens.css"
-import "./index.module.css"
 
 defineWebComponent<PackagesProps>({
   tagName: 'packages-widget',

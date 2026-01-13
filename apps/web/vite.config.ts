@@ -61,9 +61,20 @@ export default defineConfig({
 
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'react-vendor'
-            if (id.includes('@radix-ui')) return 'radix-vendor'
-            if (id.includes('@base-ui')) return 'base-ui-vendor'
+            // React core libraries (react, react-dom, react/jsx-runtime)
+            if (id.includes('react')) {
+              return 'react-vendor'
+            }
+            if (id.includes('@base-ui')) {
+              return 'base-ui-vendor'
+            }
+            if (id.includes('lucide-react')) {
+              return 'lucide-vendor'
+            }
+            if (id.includes('clsx') || id.includes('class-variance-authority')) {
+              return 'utils-vendor'
+            }
+            // Everything else
             return 'vendor'
           }
         }
