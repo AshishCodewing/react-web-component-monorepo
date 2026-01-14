@@ -14,6 +14,7 @@ RUN pnpm install --frozen-lockfile
 
 # Builder stage
 FROM base AS builder
+ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps ./apps
 COPY --from=deps /app/packages ./packages
