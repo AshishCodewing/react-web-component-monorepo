@@ -1,67 +1,65 @@
 # @monorepo/web
 
-Main application that builds React widgets as Web Components (Custom Elements) for embedding in external applications.
+Builds React widgets as Web Components (Custom Elements) for embedding in external applications.
 
 ## Scripts
 
 ```bash
-pnpm dev          # Start development server with HMR
-pnpm build        # Build for production
+pnpm dev           # Start development server with HMR
+pnpm build         # Build for production
 pnpm build:analyze # Build with bundle analysis (opens dist/stats.html)
-pnpm lint         # Run ESLint
-pnpm preview      # Preview production build
+pnpm lint          # Run ESLint
+pnpm preview       # Preview production build
 ```
 
-## Widget Build System
+## Widget Structure
 
-Vite automatically discovers widgets from `src/widgets/*/index.tsx`. Each widget directory becomes a separate entry point.
+```
+src/widgets/
+└── my-widget/
+    └── index.tsx    # Widget entry point
+```
 
-### Build Output
-
-- Individual widget bundles in `dist/assets/`
-- Manifest file for asset discovery
-- Vendor chunks: `react-vendor`, `radix-vendor`, `vendor`
+Vite automatically discovers widgets from `src/widgets/*/index.tsx`. Each widget becomes a separate bundle.
 
 ## Creating Widgets
 
-Widgets are React components wrapped as Web Components using the `WebComponentFactory`.
+Widgets wrap React components from `packages/ui` as Web Components using `WebComponentFactory`:
 
 ```tsx
-// src/widgets/{name}/index.tsx
+// src/widgets/packages/index.tsx
 import { defineWebComponent } from '@/core/WebComponentFactory'
-import Component from './Component'
-import "@/styles/widget-base.css"
+import { Packages } from '@monorepo/ui/components/packages/Package'
+import type { PackagesProps } from '@monorepo/ui/components/packages/Package'
 
-defineWebComponent({
-  tagName: 'widget-name',
-  component: Component,
+defineWebComponent<PackagesProps>({
+  tagName: 'packages-widget',
+  component: Packages,
   observedAttributes: {
-    'prop-name': 'propName',
+    'packages': 'packages',
+    'translated-texts': 'translatedTexts',
   },
-  jsonAttributes: ['prop-name'],
+  jsonAttributes: ['packages', 'translatedTexts'],
   events: {
-    onChange: 'change',
-    onSubmit: 'submit',
+    onViewDetails: 'view-details',
   },
 })
 ```
 
-## Styling
+See [WEB_COMPONENT_FACTORY_PATTERN.md](../../docs/WEB_COMPONENT_FACTORY_PATTERN.md) for full API documentation.
 
-- **Tailwind CSS v4** with `@tailwindcss/vite` plugin
-- CSS variables defined in both `:root` and `:host` for Shadow DOM compatibility
-- `src/styles/widget-base.css` - Widget entry point (imports globals + host theme)
-- `src/styles/base-theme.css` - Custom color palette using OKLCH
+## Build Output
 
-## UI Components
-
-Import shared UI components from the `@monorepo/ui` package:
-
-```tsx
-import { Button } from "@monorepo/ui/components/button"
-import { cn } from "@monorepo/ui/lib/utils"
-```
+- `dist/assets/` - Individual widget bundles
+- `dist/shared/` - Vendor chunks (`react-vendor`, `base-ui-vendor`, `vendor`)
+- `dist/manifest.json` - Asset manifest for discovery
 
 ## Path Aliases
 
 - `@/` maps to `src/`
+
+## Related Documentation
+
+- [Creating Components](../../docs/CREATING_COMPONENTS.md) - How to create components in `packages/ui`
+- [WebComponentFactory](../../docs/WEB_COMPONENT_FACTORY_PATTERN.md) - Full API reference
+- [Packages & Dependencies](../../docs/PACKAGES_AND_DEPENDENCIES.md) - Monorepo structure

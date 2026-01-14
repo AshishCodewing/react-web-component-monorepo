@@ -169,7 +169,3 @@ The component will be added to `packages/ui/src/components/` and can then be imp
 ```tsx
 import { Button } from "@monorepo/ui/components/button"
 ```
-
-### Note on Tailwind
-
-shadcn components require Tailwind CSS. If you plan to use shadcn components, ensure Tailwind is properly configured in your build pipeline. The current widget setup does not use Tailwind.
