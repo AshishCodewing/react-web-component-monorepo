@@ -1,6 +1,0 @@
-/* Widget Base Styles - Single Entry Point
- * Combines base UI styles with host theme integration
- */
-
-@import "@monorepo/ui/globals.css";
-@import "./host-theme.css";

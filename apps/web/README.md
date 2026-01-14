@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# @monorepo/web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Main application that builds React widgets as Web Components (Custom Elements) for embedding in external applications.
 
-Currently, two official plugins are available:
+## Scripts
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm dev          # Start development server with HMR
+pnpm build        # Build for production
+pnpm build:analyze # Build with bundle analysis (opens dist/stats.html)
+pnpm lint         # Run ESLint
+pnpm preview      # Preview production build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Widget Build System
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Vite automatically discovers widgets from `src/widgets/*/index.tsx`. Each widget directory becomes a separate entry point.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Build Output
+
+- Individual widget bundles in `dist/assets/`
+- Manifest file for asset discovery
+- Vendor chunks: `react-vendor`, `radix-vendor`, `vendor`
+
+## Creating Widgets
+
+Widgets are React components wrapped as Web Components using Shadow DOM for style isolation.
+
+### Using @r2wc/react-to-web-component (preferred for simple widgets)
+
+```tsx
+// src/widgets/{name}/index.tsx
+import r2wc from '@r2wc/react-to-web-component'
+import Component from './Component'
+import "@/styles/widget-base.css"
+
+customElements.define('widget-name', r2wc(Component, {
+  props: { propName: 'string' },
+  shadow: 'open',
+}))
 ```
+
+### Using WebComponentFactory (for complex widgets with events)
+
+```tsx
+// src/widgets/{name}/index.tsx
+import { defineWebComponent } from '@/core/WebComponentFactory'
+import Component from './Component'
+import "@/styles/widget-base.css"
+
+defineWebComponent('widget-name', Component, {
+  attributes: ['prop-name'],
+  events: ['change', 'submit'],
+})
+```
+
+## Styling
+
+- **Tailwind CSS v4** with `@tailwindcss/vite` plugin
+- CSS variables defined in both `:root` and `:host` for Shadow DOM compatibility
+- `src/styles/widget-base.css` - Widget entry point (imports globals + host theme)
+- `src/styles/base-theme.css` - Custom color palette using OKLCH
+
+## UI Components
+
+Import shared UI components from the `@monorepo/ui` package:
+
+```tsx
+import { Button } from "@monorepo/ui/components/button"
+import { cn } from "@monorepo/ui/lib/utils"
+```
+
+## Path Aliases
+
+- `@/` maps to `src/`

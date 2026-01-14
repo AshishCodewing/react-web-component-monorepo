@@ -220,6 +220,7 @@ export function createWebComponent<TProps = any>(
 
     /**
      * Inject styles into Shadow DOM
+     * Wraps styles in a <style> tag (only when Shadow DOM is used)
      */
     private injectStyles() {
       if (!useShadowDom || !this.mountPoint) return;
@@ -231,31 +232,30 @@ export function createWebComponent<TProps = any>(
         return;
       }
 
-      // Custom styles
+      // Custom styles - wrap in <style> tag
       if (styles) {
         const styleElement = document.createElement('style');
-        styleElement.setAttribute('data-widget', tagName);
         styleElement.textContent = styles;
         shadowRoot.appendChild(styleElement);
       }
 
       // In development, clone Vite's injected styles
-      if (import.meta.env.DEV) {
-        const mainStyles = document.querySelector('style[data-vite-dev-id]');
-        if (mainStyles) {
-          const styleClone = mainStyles.cloneNode(true) as HTMLStyleElement;
-          styleClone.setAttribute('data-vite-dev-id', '');
-          styleClone.setAttribute('data-widget', tagName);
-          shadowRoot.appendChild(styleClone);
-        }
-      } else {
-        // Production mode - link to compiled CSS
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = `/dist/${tagName}.css`;
-        link.setAttribute('data-widget', tagName);
-        shadowRoot.appendChild(link);
-      }
+      // if (import.meta.env.DEV) {
+      //   const mainStyles = document.querySelector('style[data-vite-dev-id]');
+      //   if (mainStyles) {
+      //     const styleClone = mainStyles.cloneNode(true) as HTMLStyleElement;
+      //     styleClone.setAttribute('data-vite-dev-id', '');
+      //     styleClone.setAttribute('data-widget', tagName);
+      //     shadowRoot.appendChild(styleClone);
+      //   }
+      // } else {
+      //   // Production mode - link to compiled CSS
+      //   const link = document.createElement('link');
+      //   link.rel = 'stylesheet';
+      //   link.href = `/dist/${tagName}.css`;
+      //   link.setAttribute('data-widget', tagName);
+      //   shadowRoot.appendChild(link);
+      // }
     }
 
     /**
