@@ -1,6 +1,6 @@
 import { defineWebComponent } from "@/core/WebComponentFactory";
-import Packages from "./Package";
-import type { PackagesProps } from "./Package";
+import Packages from "@monorepo/ui/components/packages/Package";
+import type { PackagesProps } from "@monorepo/ui/components/packages/Package";
 
 defineWebComponent<PackagesProps>({
   tagName: 'packages-widget',

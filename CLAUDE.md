@@ -38,23 +38,32 @@ docker compose --profile production up  # Production build on port 8080
 
 ### Web Component Pattern
 
-Widgets are React components wrapped as Web Components. Two patterns are used:
+Widgets are React components wrapped as Web Components using `WebComponentFactory`:
 
-1. **@r2wc/react-to-web-component** (preferred for simple widgets):
 ```tsx
 // apps/web/src/widgets/{name}/index.tsx
-import r2wc from '@r2wc/react-to-web-component'
+import { defineWebComponent } from '@/core/WebComponentFactory'
 import Component from './Component'
 import "@/styles/widget-base.css"
 
-customElements.define('widget-name', r2wc(Component, {
-  props: { propName: 'string' },
-  shadow: 'open',
-}))
+defineWebComponent({
+  tagName: 'widget-name',
+  component: Component,
+  observedAttributes: {
+    'prop-name': 'propName',
+  },
+  jsonAttributes: ['propName'],
+  events: {
+    onSelect: 'select',
+  },
+})
 ```
 
-2. **WebComponentFactory** (for complex widgets with events):
-   - `apps/web/src/core/WebComponentFactory.tsx` provides `defineWebComponent()` with attribute mapping, JSON parsing, and custom event dispatching
+The factory (`apps/web/src/core/WebComponentFactory.tsx`) provides:
+- Attribute mapping (kebab-case to camelCase)
+- JSON attribute parsing
+- Custom event dispatching
+- Optional Shadow DOM
 
 ### Widget Build System
 

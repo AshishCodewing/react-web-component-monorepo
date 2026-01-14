@@ -2,12 +2,38 @@
 
 The `WebComponentFactory` is a utility for wrapping React components as Web Components (Custom Elements) with advanced features like attribute mapping, JSON parsing, and custom event dispatching.
 
-## When to Use
+## Component Source
 
-| Pattern | Use Case |
-|---------|----------|
-| `@r2wc/react-to-web-component` | Simple widgets with basic props |
-| `WebComponentFactory` | Complex widgets needing custom events, JSON attributes, or fine-grained control |
+React components passed to `defineWebComponent` should be imported from `packages/ui`:
+
+```
+apps/web/src/widgets/
+└── my-widget/
+    └── index.tsx          # Widget entry point (uses WebComponentFactory)
+
+packages/ui/src/components/
+└── my-component/
+    ├── MyComponent.tsx    # React component logic
+    └── index.module.css   # Component styles
+```
+
+```tsx
+// apps/web/src/widgets/my-widget/index.tsx
+import { defineWebComponent } from '@/core/WebComponentFactory'
+import { MyComponent } from '@monorepo/ui/components/my-component/MyComponent'
+
+defineWebComponent({
+  tagName: 'my-widget',
+  component: MyComponent,
+  // ...
+})
+```
+
+This separation keeps:
+- **packages/ui** - Reusable React components with styling
+- **apps/web** - Widget entry points that wrap components as Web Components
+
+See [CREATING_COMPONENTS.md](./CREATING_COMPONENTS.md) for how to create components in `packages/ui`.
 
 ## API
 

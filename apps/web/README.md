@@ -24,23 +24,7 @@ Vite automatically discovers widgets from `src/widgets/*/index.tsx`. Each widget
 
 ## Creating Widgets
 
-Widgets are React components wrapped as Web Components using Shadow DOM for style isolation.
-
-### Using @r2wc/react-to-web-component (preferred for simple widgets)
-
-```tsx
-// src/widgets/{name}/index.tsx
-import r2wc from '@r2wc/react-to-web-component'
-import Component from './Component'
-import "@/styles/widget-base.css"
-
-customElements.define('widget-name', r2wc(Component, {
-  props: { propName: 'string' },
-  shadow: 'open',
-}))
-```
-
-### Using WebComponentFactory (for complex widgets with events)
+Widgets are React components wrapped as Web Components using the `WebComponentFactory`.
 
 ```tsx
 // src/widgets/{name}/index.tsx
@@ -48,9 +32,17 @@ import { defineWebComponent } from '@/core/WebComponentFactory'
 import Component from './Component'
 import "@/styles/widget-base.css"
 
-defineWebComponent('widget-name', Component, {
-  attributes: ['prop-name'],
-  events: ['change', 'submit'],
+defineWebComponent({
+  tagName: 'widget-name',
+  component: Component,
+  observedAttributes: {
+    'prop-name': 'propName',
+  },
+  jsonAttributes: ['prop-name'],
+  events: {
+    onChange: 'change',
+    onSubmit: 'submit',
+  },
 })
 ```
 

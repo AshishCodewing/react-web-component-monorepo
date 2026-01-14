@@ -53,10 +53,7 @@ docker compose --profile production up
 
 ### Web Components
 
-Widgets are React components wrapped as Web Components using Shadow DOM for style isolation. Two patterns are available:
-
-1. **@r2wc/react-to-web-component** - Preferred for simple widgets
-2. **WebComponentFactory** - For complex widgets with custom events
+Widgets are React components wrapped as Web Components using the `WebComponentFactory`, which provides attribute mapping, JSON parsing, and custom event dispatching.
 
 ### Widget Discovery
 
