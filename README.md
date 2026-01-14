@@ -59,12 +59,6 @@ Widgets are React components wrapped as Web Components using the `WebComponentFa
 
 Vite automatically discovers widgets from `apps/web/src/widgets/*/index.tsx`. Each widget directory becomes a separate entry point with its own bundle.
 
-### Styling
-
-- **Tailwind CSS v4** with `@tailwindcss/vite` plugin
-- CSS variables in both `:root` and `:host` for Shadow DOM compatibility
-- shadcn/ui "new-york" style components
-
 ## Requirements
 
 - Node.js >= 20.0.0
